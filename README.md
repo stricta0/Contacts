@@ -139,8 +139,9 @@ The application consists of the following main components:
 ------------------------------------------------------------------------
 
 ### Running with Docker (recommended)
+0. Add .env file to root folder
 
-1Build and start containers:
+1. Build and start containers:
 
 ```bash
   docker compose up --build
