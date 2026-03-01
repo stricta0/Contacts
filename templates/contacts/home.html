@@ -1,0 +1,283 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Contacts</title>
+
+    <link rel="stylesheet" href="{% static 'contacts/style.css' %}" />
+    <script defer src="{% static 'contacts/app.js' %}"></script>
+  </head>
+
+  <body>
+    <div class="page">
+      <!-- Top bar -->
+      <header class="topbar">
+        <div class="search">
+          <label class="sr-only" for="searchInput">Search contacts</label>
+          <input id="searchInput" type="search" placeholder="Search..." autocomplete="off" />
+        </div>
+
+        <div class="actions">
+          <button id="btnAddNew" class="btn btn-primary" type="button">+ Add new</button>
+          <button id="btnImportCsv" class="btn btn-secondary" type="button">Import CSV</button>
+        </div>
+      </header>
+
+      <!-- Title -->
+      <div class="title-row">
+        <h1>Contacts</h1>
+      </div>
+
+      <!-- Table -->
+      <section class="card">
+        <div class="table-wrap" role="region" aria-label="Contacts table">
+          <table class="table" aria-describedby="contactsHint">
+            <caption class="sr-only" id="contactsHint">
+              Contacts list.
+            </caption>
+
+            <thead>
+              <tr>
+                <th scope="col" class="col-id">
+                  <button class="th-btn" type="button" data-sort-key="id" aria-pressed="false">
+                    <span class="th-label">ID</span>
+                    <span class="th-arrow" aria-hidden="true">↓</span>
+                  </button>
+                </th>
+
+                <th scope="col">
+                  <button class="th-btn" type="button" data-sort-key="name" aria-pressed="false">
+                    <span class="th-label">Name</span>
+                    <span class="th-arrow" aria-hidden="true">↓</span>
+                  </button>
+                </th>
+
+                <th scope="col">
+                  <button class="th-btn" type="button" data-sort-key="last_name" aria-pressed="false">
+                    <span class="th-label">Last name</span>
+                    <span class="th-arrow" aria-hidden="true">↓</span>
+                  </button>
+                </th>
+
+                <th scope="col">
+                  <button class="th-btn" type="button" data-sort-key="email" aria-pressed="false">
+                    <span class="th-label">Email</span>
+                    <span class="th-arrow" aria-hidden="true">↓</span>
+                  </button>
+                </th>
+
+                <th scope="col" class="col-phone">
+                  <button class="th-btn" type="button" data-sort-key="phone" aria-pressed="false">
+                    <span class="th-label">Phone</span>
+                    <span class="th-arrow" aria-hidden="true">↓</span>
+                  </button>
+                </th>
+
+                <th scope="col">
+                  <button class="th-btn" type="button" data-sort-key="city" aria-pressed="false">
+                    <span class="th-label">
+                      City
+                      <span class="th-sublabel" aria-hidden="true">temp · humidity · wind speed</span>
+                    </span>
+                    <span class="th-arrow" aria-hidden="true">↓</span>
+                  </button>
+                </th>
+
+                <th scope="col">
+                  <button class="th-btn" type="button" data-sort-key="status" aria-pressed="false">
+                    <span class="th-label">Status</span>
+                    <span class="th-arrow" aria-hidden="true">↓</span>
+                  </button>
+                </th>
+
+                <th scope="col" class="col-date">
+                  <button class="th-btn" type="button" data-sort-key="add_date" aria-pressed="false">
+                    <span class="th-label">Created</span>
+                    <span class="th-arrow" aria-hidden="true">↓</span>
+                  </button>
+                </th>
+              </tr>
+            </thead>
+
+            <tbody id="contactsTbody">
+              <!-- Rows are injected by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- Add / Edit contact modal -->
+    <div id="addModal" class="modal" aria-hidden="true" data-mode="add" data-edit-id="">
+      <div class="modal__backdrop" data-close-modal></div>
+
+      <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="addModalTitle">
+        <div class="modal__header">
+          <h2 id="addModalTitle">Add new contact</h2>
+          <button class="icon-btn" type="button" data-close-modal aria-label="Close">✕</button>
+        </div>
+
+        <div class="modal__content">
+          <form id="addContactForm" class="form-grid" autocomplete="off">
+            <div class="field">
+              <label for="firstName">First name</label>
+              <input id="firstName" name="first_name" type="text" required />
+            </div>
+
+            <div class="field">
+              <label for="lastName">Last name</label>
+              <input id="lastName" name="last_name" type="text" required />
+            </div>
+
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" required autocomplete="email" inputmode="email" />
+            </div>
+
+            <div class="field">
+              <label for="phone">Phone</label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                required
+                autocomplete="tel"
+                inputmode="tel"
+                placeholder="+48 600 123 456"
+              />
+            </div>
+
+            <div class="field">
+              <label for="city">City</label>
+              <input id="city" name="city" type="text" required />
+            </div>
+
+            <div class="field">
+              <label for="status">Status</label>
+              <select id="status" name="status_name" required>
+                <option value="" selected disabled>Choose status...</option>
+                <!-- Options are injected by app.js -->
+              </select>
+            </div>
+
+            <div id="addFormError" class="form-error" role="alert" aria-live="polite"></div>
+            <div id="addFormSuccess" class="form-success" role="status" aria-live="polite"></div>
+
+            <div class="modal__footer">
+              <div class="modal__footer-left">
+                <button id="btnCancelAdd" class="btn btn-secondary" type="button">Cancel</button>
+                <button id="btnClearAdd" class="btn btn-secondary" type="button">Clear</button>
+                <button id="btnDeleteContact" class="btn btn-danger" type="button">Delete</button>
+              </div>
+
+              <div class="modal__footer-right">
+                <button id="btnSubmitAdd" class="btn btn-primary" type="button">Add</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm delete modal -->
+    <div id="confirmDeleteModal" class="modal" aria-hidden="true">
+      <div class="modal__backdrop" data-close-confirm></div>
+
+      <div class="modal__dialog modal__dialog--small" role="dialog" aria-modal="true" aria-labelledby="confirmDeleteTitle">
+        <div class="modal__header">
+          <h2 id="confirmDeleteTitle">Delete contact?</h2>
+          <button class="icon-btn" type="button" data-close-confirm aria-label="Close">✕</button>
+        </div>
+
+        <div class="modal__content">
+          <p class="confirm-text">
+            This action cannot be undone. Are you sure you want to delete
+            <span id="confirmDeleteName" class="confirm-name"></span>?
+          </p>
+
+          <div id="confirmDeleteError" class="form-error" role="alert" aria-live="polite"></div>
+
+          <div class="confirm-actions">
+            <button id="btnConfirmDeleteCancel" class="btn btn-secondary" type="button">Cancel</button>
+            <button id="btnConfirmDelete" class="btn btn-danger" type="button">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Import CSV modal -->
+    <div id="importCsvModal" class="modal" aria-hidden="true">
+      <div class="modal__backdrop" data-close-import></div>
+
+      <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="importCsvTitle">
+        <div class="modal__header">
+          <h2 id="importCsvTitle">Import contacts from CSV</h2>
+          <button class="icon-btn" type="button" data-close-import aria-label="Close">✕</button>
+        </div>
+
+        <div class="modal__content">
+          <div class="import-grid">
+            <div>
+              <div
+                id="csvDropzone"
+                class="dropzone"
+                tabindex="0"
+                role="button"
+                aria-label="Drop a CSV file here or click to select"
+              >
+                <div class="dropzone-title">Drop CSV here</div>
+                <div class="dropzone-sub">or click to choose a file</div>
+
+                <input id="csvFileInput" type="file" accept=".csv,text/csv" style="display: none" />
+
+                <div id="csvSelectedFile" class="dropzone-file">No file selected</div>
+              </div>
+
+              <div class="import-actions">
+                <button id="btnImportCancel" class="btn btn-secondary" type="button">Cancel</button>
+                <button id="btnImportClear" class="btn btn-secondary" type="button">Clear</button>
+                <button id="btnImportStart" class="btn btn-primary" type="button" disabled>Upload</button>
+              </div>
+
+              <div id="importFormError" class="form-error" role="alert" aria-live="polite"></div>
+
+              <div id="importResults" class="import-results" style="display: none">
+                <div class="import-results-head">
+                  <div>Import results</div>
+                  <div id="importResultsMeta" class="import-results-meta">OK: 0 · ERROR: 0</div>
+                </div>
+
+                <div id="importLog" class="import-log">
+                  <!-- Lines are injected by app.js -->
+                </div>
+              </div>
+            </div>
+
+            <div class="import-help">
+              <h3 class="import-h3">CSV format</h3>
+              <p class="import-p">The file must be a CSV with a header row and columns in this exact order:</p>
+
+              <pre class="import-code">first_name,last_name,email,phone,city,status</pre>
+
+              <p class="import-p">Example:</p>
+
+              <pre class="import-code">first_name,last_name,email,phone,city,status
+Jan,Kowalski,jan.kowalski@example.com,+48 600 700 800,Wrocław,new
+Anna,Nowak,anna.nowak@example.com,+48 500 400 300,Warszawa,in_progress</pre>
+
+              <ul class="import-ul">
+                <li>
+                  <b>status</b> must match one of the values returned by <code>/api/contacts/statuses/</code>
+                </li>
+                <li>Use UTF-8 encoding (recommended)</li>
+                <li>One contact per line</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

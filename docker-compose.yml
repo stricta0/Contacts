@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:16
+    container_name: contacts_db
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - contacts_pgdata:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  migrate:
+    build: .
+    container_name: contacts_migrate
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["python", "manage.py", "migrate", "--noinput"]
+    restart: "no"
+
+  seed:
+    build: .
+    container_name: contacts_seed
+    env_file: .env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    command: [ "python", "manage.py", "seed_statuses" ]
+    restart: "no"
+
+  web:
+    build: .
+    container_name: contacts_web
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+volumes:
+  contacts_pgdata:
