@@ -8,12 +8,12 @@
 
 ## Table of Contents
 
+-   [Installation & Setup](#installation--setup)
 -   [Overview](#overview)
 -   [Architecture](#architecture)
 -   [Tech Stack](#tech-stack)
 -   [Features](#features)
 -   [Project Structure](#project-structure)
--   [Installation & Setup](#installation--setup)
 -   [Environment Variables](#environment-variables)
 -   [API Documentation](#api-documentation)
 -   [Database & Migrations](#database--migrations)
