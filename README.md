@@ -201,6 +201,9 @@ http://127.0.0.1:8000
 
 ## Environment Variables
 
+Link to .env files:
+https://drive.google.com/file/d/1CcTQeaSSJr8yg8lPOKoATEV9ButOzc-N/view?usp=sharing
+
 Below are the environment variables required to run the application.
 
 | Variable | Description | Example |
